@@ -41,6 +41,8 @@ func CodeName(t EvType, c EvCode) string {
 		name, ok = LEDName[c]
 	case EV_SND:
 		name, ok = SNDName[c]
+	case EV_REL:
+		name, ok = RELName[c]
 	default:
 		return "UNSUPPORTED"
 	}
