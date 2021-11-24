@@ -1,3 +1,3 @@
-module github.com/holoplot/go-evdev
+module github.com/nongfah/go-evdev
 
 go 1.13
