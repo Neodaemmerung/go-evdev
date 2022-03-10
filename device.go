@@ -198,7 +198,7 @@ func (d *InputDevice) Revoke() error {
 func (d *InputDevice) Read() ([]InputEvent, error) {
 	events := make([]InputEvent, 16)
 
-	err = binary.Read(d.file, binary.LittleEndian, &events)
+	err := binary.Read(d.file, binary.LittleEndian, &events)
 	if err != nil {
 		return events, err
 	}
