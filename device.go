@@ -1,10 +1,14 @@
 package evdev
 
 import (
+	"bytes"
 	"encoding/binary"
 	"fmt"
 	"os"
+	"unsafe"
 )
+
+var eventsize = int(unsafe.Sizeof(InputEvent{}))
 
 // InputDevice represent a Linux kernel input device in userspace.
 // It can be used to query and write device properties, read input events,
@@ -193,12 +197,18 @@ func (d *InputDevice) Revoke() error {
 	return ioctlEVIOCREVOKE(d.file.Fd())
 }
 
-
 // Read and return a slice of input events from device.
 func (d *InputDevice) Read() ([]InputEvent, error) {
 	events := make([]InputEvent, 16)
+	buffer := make([]byte, eventsize*16)
 
-	err := binary.Read(d.file, binary.LittleEndian, &events)
+	_, err := d.file.Read(buffer)
+	if err != nil {
+		return events, err
+	}
+
+	b := bytes.NewBuffer(buffer)
+	err = binary.Read(b, binary.LittleEndian, &events)
 	if err != nil {
 		return events, err
 	}
@@ -218,8 +228,15 @@ func (d *InputDevice) Read() ([]InputEvent, error) {
 // been received or an error has occured.
 func (d *InputDevice) ReadOne() (*InputEvent, error) {
 	event := InputEvent{}
+	buffer := make([]byte, eventsize)
 
-	err := binary.Read(d.file, binary.LittleEndian, &event)
+	_, err := d.file.Read(buffer)
+	if err != nil {
+		return &event, err
+	}
+
+	b := bytes.NewBuffer(buffer)
+	err = binary.Read(b, binary.LittleEndian, &event)
 	if err != nil {
 		return nil, err
 	}
