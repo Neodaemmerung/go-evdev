@@ -193,6 +193,27 @@ func (d *InputDevice) Revoke() error {
 	return ioctlEVIOCREVOKE(d.file.Fd())
 }
 
+
+// Read and return a slice of input events from device.
+func (dev *InputDevice) Read() ([]InputEvent, error) {
+	events := make([]InputEvent, 16)
+
+	err = binary.Read(d.file, binary.LittleEndian, &events)
+	if err != nil {
+		return events, err
+	}
+
+	// remove trailing structures
+	for i := range events {
+		if events[i].Time.Sec == 0 {
+			events = append(events[:i])
+			break
+		}
+	}
+
+	return events, err
+}
+
 // ReadOne reads one InputEvent from the device. It blocks until an event has
 // been received or an error has occured.
 func (d *InputDevice) ReadOne() (*InputEvent, error) {
