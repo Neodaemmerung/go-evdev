@@ -195,7 +195,7 @@ func (d *InputDevice) Revoke() error {
 
 
 // Read and return a slice of input events from device.
-func (dev *InputDevice) Read() ([]InputEvent, error) {
+func (d *InputDevice) Read() ([]InputEvent, error) {
 	events := make([]InputEvent, 16)
 
 	err = binary.Read(d.file, binary.LittleEndian, &events)
